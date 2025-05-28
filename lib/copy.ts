@@ -3,8 +3,24 @@ import path from "path";
 
 import { ALLOWED_TEXT_FILE_EXTENSIONS } from "./constants";
 
-export async function copyFileContentsToClipboard(filePaths: string[]) {
+export async function copyFileContentsToClipboard(
+  filePaths: string[],
+  userPrompt: string,
+  tree: string,
+  aiResponseMode: "diff" | "normal"
+) {
   const processedContents: string[] = [];
+
+  let modeInstruction = "";
+  if (aiResponseMode === "diff") {
+    modeInstruction = "Please respond only with diffs.";
+  } else {
+    modeInstruction = "Please respond freely.";
+  }
+
+  const header = `AI Response Mode: ${aiResponseMode === "diff" ? "Diff" : "Normal"}\n${modeInstruction}\n\n`;
+  const userPromptSection = `User's Request:\n${userPrompt}\n\n`;
+  const treeSection = `Repository Tree:\n${tree}\n\n`;
 
   for (const filePath of filePaths) {
     const ext = path.extname(filePath).toLowerCase();
@@ -28,7 +44,7 @@ export async function copyFileContentsToClipboard(filePaths: string[]) {
     }
   }
 
-  const finalContent = processedContents.join(" ");
+  const finalContent = `${header}${userPromptSection}${treeSection}Relevant File Contents:\n${processedContents.join(" ")}`;
   await copyToClipboard(finalContent);
 }
 

@@ -77,7 +77,24 @@ program.action(async () => {
 
     switch (copyAnswers.copyOption) {
       case "content":
-        await copyFileContentsToClipboard(relevantFiles);
+        const modeAnswers = await inquirer.prompt([
+          {
+            type: "list",
+            name: "aiResponseMode",
+            message: "Select AI response mode:",
+            choices: [
+              { name: "Diff Mode (AI responds with diffs)", value: "diff" },
+              { name: "Normal Mode (AI responds freely)", value: "normal" },
+            ],
+          },
+        ]);
+        const aiResponseMode = modeAnswers.aiResponseMode;
+        await copyFileContentsToClipboard(
+          relevantFiles,
+          userPrompt,
+          tree,
+          aiResponseMode
+        );
         console.log("All relevant file contents copied to clipboard!");
         break;
       case "json":
