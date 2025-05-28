@@ -1,3 +1,4 @@
+#!/usr/bin/env bun
 import { Command } from "commander";
 import inquirer from "inquirer";
 import { getTreeStructure } from "./tree";

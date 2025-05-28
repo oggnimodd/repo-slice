@@ -3,6 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "build": "bun run scripts/build.ts"
+  },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "latest"
@@ -19,5 +22,8 @@
     "inquirer": "^12.6.3",
     "ora": "^8.2.0",
     "zod": "^3.25.32"
+  },
+  "bin": {
+    "repo-slice": "./dist/cli.js"
   }
 }
