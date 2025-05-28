@@ -4,6 +4,12 @@ import { getTreeStructure } from "./tree";
 import { callAI } from "./ai";
 import { buildPrompt } from "./prompt";
 import {
+  copyFileContentsToClipboard,
+  copyFilePathsAsJson,
+  copyFilePathsAsAtFileFormat,
+  copyFilePathsAsNewlineSeparated,
+} from "./copy";
+import {
   ALLOWED_TEXT_FILE_EXTENSIONS,
   MAX_FILE_LINES,
   MAX_FILE_SIZE_BYTES,
@@ -39,9 +45,56 @@ program.action(async () => {
     const fullPrompt = buildPrompt(userPrompt, tree, concatenatedContent);
     const aiResponse = await callAI(fullPrompt);
 
-    const relevantFiles: string[] = aiResponse.relevant_files; // Directly access relevant_files
+    const relevantFiles: string[] = aiResponse.relevant_files;
     console.log("Relevant files:");
     relevantFiles.forEach((file: string) => console.log(`- ${file}`));
+
+    const copyAnswers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "copyOption",
+        message: "How would you like to copy the relevant files?",
+        choices: [
+          {
+            name: "Copy all file content to clipboard",
+            value: "content",
+          },
+          {
+            name: "Copy relevant file paths as JSON array",
+            value: "json",
+          },
+          {
+            name: "Copy relevant file paths as @file format (@file1 @file2)",
+            value: "at_file",
+          },
+          {
+            name: "Copy relevant file paths as newline-separated list",
+            value: "newline",
+          },
+        ],
+      },
+    ]);
+
+    switch (copyAnswers.copyOption) {
+      case "content":
+        await copyFileContentsToClipboard(relevantFiles);
+        console.log("All relevant file contents copied to clipboard!");
+        break;
+      case "json":
+        await copyFilePathsAsJson(relevantFiles);
+        console.log("Relevant file paths (JSON) copied to clipboard!");
+        break;
+      case "at_file":
+        await copyFilePathsAsAtFileFormat(relevantFiles);
+        console.log("Relevant file paths (@file format) copied to clipboard!");
+        break;
+      case "newline":
+        await copyFilePathsAsNewlineSeparated(relevantFiles);
+        console.log(
+          "Relevant file paths (newline-separated) copied to clipboard!"
+        );
+        break;
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error analyzing repository:", error.message);

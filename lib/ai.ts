@@ -1,10 +1,9 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateObject } from "ai"; // Changed from generateText to generateObject
+import { generateObject } from "ai";
 import ora from "ora";
 import { GEMINI_API_KEY, DEFAULT_MODEL_NAME } from "./constants";
-import { z } from "zod"; // Import zod
+import { z } from "zod";
 
-// Define the schema for the expected AI response
 const relevantFilesSchema = z.object({
   relevant_files: z.array(z.string()),
 });
@@ -27,11 +26,11 @@ export async function callAI(
   try {
     const { object } = await generateObject({
       model: model,
-      schema: relevantFilesSchema, // Pass the Zod schema
+      schema: relevantFilesSchema,
       prompt: prompt,
     });
     spinner.succeed("✅ AI analysis complete!");
-    return object; // Return the parsed object directly
+    return object;
   } catch (error: unknown) {
     spinner.fail("❌ Error asking AI for relevant files.");
     if (error instanceof Error) {

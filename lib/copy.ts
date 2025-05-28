@@ -3,7 +3,7 @@ import path from "path";
 
 import { ALLOWED_TEXT_FILE_EXTENSIONS } from "./constants";
 
-export async function copy(filePaths: string[]) {
+export async function copyFileContentsToClipboard(filePaths: string[]) {
   const processedContents: string[] = [];
 
   for (const filePath of filePaths) {
@@ -23,16 +23,19 @@ export async function copy(filePaths: string[]) {
         processedContents.push(formattedContent);
       } catch (error) {
         console.error(`Error reading file ${filePath}:`, error);
-        processedContents.push(filePath); // If error, just push the path
+        processedContents.push(filePath);
       }
     }
   }
 
   const finalContent = processedContents.join(" ");
+  await copyToClipboard(finalContent);
+}
 
+async function copyToClipboard(text: string) {
   try {
     const proc = Bun.spawn(["xclip", "-selection", "clipboard"], {
-      stdin: new TextEncoder().encode(finalContent),
+      stdin: new TextEncoder().encode(text),
     });
     await proc.exited;
     if (proc.exitCode !== 0) {
@@ -45,4 +48,19 @@ export async function copy(filePaths: string[]) {
       error
     );
   }
+}
+
+export async function copyFilePathsAsJson(filePaths: string[]) {
+  const jsonContent = JSON.stringify(filePaths, null, 2);
+  await copyToClipboard(jsonContent);
+}
+
+export async function copyFilePathsAsAtFileFormat(filePaths: string[]) {
+  const atFileContent = filePaths.map((p) => `@${p}`).join(" ");
+  await copyToClipboard(atFileContent);
+}
+
+export async function copyFilePathsAsNewlineSeparated(filePaths: string[]) {
+  const newlineContent = filePaths.join("\n");
+  await copyToClipboard(newlineContent);
 }

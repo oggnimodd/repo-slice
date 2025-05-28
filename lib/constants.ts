@@ -61,8 +61,8 @@ export const ALLOWED_TEXT_FILE_EXTENSIONS = [
 
 export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 export const DEFAULT_MODEL_NAME = "gemini-2.0-flash";
-export const MAX_FILE_LINES = 500; // Max lines per file to concatenate
-export const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024; // 1MB
+export const MAX_FILE_LINES = 500;
+export const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024;
 
 export const EXCLUDED_FILE_PATTERNS = [
   "package-lock.json",
