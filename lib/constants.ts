@@ -58,3 +58,21 @@ export const ALLOWED_TEXT_FILE_EXTENSIONS = [
   "LICENSE",
   "README",
 ];
+
+export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+export const DEFAULT_MODEL_NAME = "gemini-2.0-flash";
+export const MAX_FILE_LINES = 500; // Max lines per file to concatenate
+export const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024; // 1MB
+
+export const EXCLUDED_FILE_PATTERNS = [
+  "package-lock.json",
+  "bun.lockb",
+  "pnpm-lock.yaml",
+  "yarn.lock",
+  "node_modules",
+  "dist",
+  "build",
+  ".git",
+  ".DS_Store",
+  "Thumbs.db",
+];
