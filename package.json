@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun run scripts/build.ts"
+    "build": "bun run scripts/build.ts",
+    "install": "bun run build && cp ./dist/repo-slice.js ~/bin/repo-slice"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
