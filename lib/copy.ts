@@ -2,6 +2,7 @@ import type { BunFile } from "bun";
 import path from "path";
 
 import { ALLOWED_TEXT_FILE_EXTENSIONS } from "./constants";
+import { estimateTokenCount } from "./utils"; // Import estimateTokenCount
 
 export async function copyFileContentsToClipboard(
   filePaths: string[],
@@ -46,6 +47,11 @@ export async function copyFileContentsToClipboard(
 
   const finalContent = `${header}${userPromptSection}${treeSection}Relevant File Contents:\n${processedContents.join(" ")}`;
   await copyToClipboard(finalContent);
+
+  const finalContentTokenCount = estimateTokenCount(finalContent);
+  console.log(
+    `Estimated token count for copied content: ${finalContentTokenCount}`
+  );
 }
 
 async function copyToClipboard(text: string) {

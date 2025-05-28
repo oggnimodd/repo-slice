@@ -63,6 +63,7 @@ export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 export const DEFAULT_MODEL_NAME = "gemini-2.0-flash";
 export const MAX_FILE_LINES = 500;
 export const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024;
+export const MAX_AI_TOKENS = 1_000_000; // 1 Million tokens
 
 export const EXCLUDED_FILE_PATTERNS = [
   "package-lock.json",

@@ -14,7 +14,9 @@ import {
   MAX_FILE_LINES,
   MAX_FILE_SIZE_BYTES,
   EXCLUDED_FILE_PATTERNS,
+  MAX_AI_TOKENS, // Add MAX_AI_TOKENS import
 } from "./constants";
+import { estimateTokenCount } from "./utils"; // Import estimateTokenCount
 import path, { join } from "path";
 import { readdir, stat } from "fs/promises";
 
@@ -43,6 +45,17 @@ program.action(async () => {
     const concatenatedContent = await getConcatenatedFileContent(".");
 
     const fullPrompt = buildPrompt(userPrompt, tree, concatenatedContent);
+
+    const promptTokenCount = estimateTokenCount(fullPrompt);
+    console.log(`Estimated token count for AI prompt: ${promptTokenCount}`);
+
+    if (promptTokenCount >= MAX_AI_TOKENS) {
+      console.error(
+        `Error: The prompt's estimated token count (${promptTokenCount}) exceeds the maximum allowed (${MAX_AI_TOKENS}). Aborting AI call.`
+      );
+      return; // Exit the action if token count is too high
+    }
+
     const aiResponse = await callAI(fullPrompt);
 
     const relevantFiles: string[] = aiResponse.relevant_files;
