@@ -17,7 +17,6 @@ import {
   EXCLUDED_FILE_PATTERNS,
   MAX_AI_TOKENS,
   ALLOWED_MODELS,
-  DEFAULT_MODEL_ALIAS,
   DEFAULT_MODEL_NAME,
 } from "./constants";
 import { estimateTokenCount } from "./utils";
