@@ -70,7 +70,7 @@ export const DEFAULT_MODEL_ALIAS = "2";
 export const DEFAULT_MODEL_NAME = ALLOWED_MODELS[DEFAULT_MODEL_ALIAS];
 export const MAX_FILE_LINES = 500;
 export const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024;
-export const MAX_AI_TOKENS = 1_000_000; // 1 Million tokens
+export const MAX_AI_TOKENS = 1_000_000;
 
 export const EXCLUDED_FILE_PATTERNS = [
   "package-lock.json",

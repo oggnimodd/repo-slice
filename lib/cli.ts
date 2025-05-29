@@ -15,12 +15,12 @@ import {
   MAX_FILE_LINES,
   MAX_FILE_SIZE_BYTES,
   EXCLUDED_FILE_PATTERNS,
-  MAX_AI_TOKENS, // Add MAX_AI_TOKENS import
-  ALLOWED_MODELS, // Import ALLOWED_MODELS
-  DEFAULT_MODEL_ALIAS, // Import DEFAULT_MODEL_ALIAS
-  DEFAULT_MODEL_NAME, // Import DEFAULT_MODEL_NAME
+  MAX_AI_TOKENS,
+  ALLOWED_MODELS,
+  DEFAULT_MODEL_ALIAS,
+  DEFAULT_MODEL_NAME,
 } from "./constants";
-import { estimateTokenCount } from "./utils"; // Import estimateTokenCount
+import { estimateTokenCount } from "./utils";
 import path, { join } from "path";
 import { readdir, stat } from "fs/promises";
 
@@ -77,7 +77,7 @@ program.action(async () => {
       console.error(
         `Error: The prompt's estimated token count (${promptTokenCount}) exceeds the maximum allowed (${MAX_AI_TOKENS}). Aborting AI call.`
       );
-      return; // Exit the action if token count is too high
+      return;
     }
 
     const aiResponse = await callAI(fullPrompt, selectedModelName as string);
@@ -177,7 +177,7 @@ program.action(async () => {
 
           console.log("Refining relevant files based on your comments...");
           const refinementPrompt = buildRefinementPrompt(
-            fullPrompt, // Pass the full initial prompt for context
+            fullPrompt,
             relevantFiles,
             userComments
           );
@@ -188,7 +188,6 @@ program.action(async () => {
           relevantFiles = refinedResponse.relevant_files;
           console.log("Refined relevant files:");
           relevantFiles.forEach((file: string) => console.log(`- ${file}`));
-          // Loop continues to allow further refinement or copy action
           break;
         case "exit":
           console.log("Exiting without copying files.");

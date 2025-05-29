@@ -2,7 +2,7 @@ import type { BunFile } from "bun";
 import path from "path";
 
 import { ALLOWED_TEXT_FILE_EXTENSIONS } from "./constants";
-import { estimateTokenCount } from "./utils"; // Import estimateTokenCount
+import { estimateTokenCount } from "./utils";
 
 export async function copyFileContentsToClipboard(
   filePaths: string[],

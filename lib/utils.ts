@@ -9,15 +9,13 @@ export function estimateTokenCount(text: string) {
   let inAlphanumericSequence = false;
 
   while (i < len) {
-    const char = text[i]!; // Non-null assertion as i is always within bounds
+    const char = text[i]!;
 
-    // Check if character is alphanumeric
     const isAlphanumeric =
       (char >= "a" && char <= "z") ||
       (char >= "A" && char <= "Z") ||
       (char >= "0" && char <= "9");
 
-    // Check if character is whitespace
     const isWhitespace =
       char === " " || char === "\n" || char === "\r" || char === "\t";
 
@@ -29,10 +27,8 @@ export function estimateTokenCount(text: string) {
     } else if (isWhitespace) {
       inAlphanumericSequence = false;
     } else {
-      // Character is non-alphanumeric and non-whitespace (e.g., punctuation)
-      // Each such character counts as a new token.
       tokenCount++;
-      inAlphanumericSequence = false; // A punctuation mark breaks an alphanumeric sequence
+      inAlphanumericSequence = false;
     }
     i++;
   }
