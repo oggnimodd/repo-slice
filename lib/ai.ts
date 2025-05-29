@@ -1,7 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import ora from "ora";
-import { GEMINI_API_KEY, DEFAULT_MODEL_NAME } from "./constants";
+import { GEMINI_API_KEY } from "./constants";
 import { z } from "zod";
 
 const relevantFilesSchema = z.object({
@@ -9,7 +9,8 @@ const relevantFilesSchema = z.object({
 });
 
 export async function callAI(
-  prompt: string
+  prompt: string,
+  modelName: string
 ): Promise<z.infer<typeof relevantFilesSchema>> {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY is not set in the environment.");
@@ -19,7 +20,7 @@ export async function callAI(
     apiKey: GEMINI_API_KEY,
   });
 
-  const model = google(DEFAULT_MODEL_NAME);
+  const model = google(modelName);
 
   const spinner = ora("✨ Asking AI for relevant files...").start();
 

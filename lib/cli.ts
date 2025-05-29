@@ -16,6 +16,9 @@ import {
   MAX_FILE_SIZE_BYTES,
   EXCLUDED_FILE_PATTERNS,
   MAX_AI_TOKENS, // Add MAX_AI_TOKENS import
+  ALLOWED_MODELS, // Import ALLOWED_MODELS
+  DEFAULT_MODEL_ALIAS, // Import DEFAULT_MODEL_ALIAS
+  DEFAULT_MODEL_NAME, // Import DEFAULT_MODEL_NAME
 } from "./constants";
 import { estimateTokenCount } from "./utils"; // Import estimateTokenCount
 import path, { join } from "path";
@@ -28,7 +31,8 @@ program
   .description(
     "CLI tool to analyze repository structure and identify relevant files"
   )
-  .version("1.0.0");
+  .version("1.0.0")
+  .option("-m, --model <alias>", "Select the AI model to use (2 or 2.5)");
 
 program.action(async () => {
   try {
@@ -40,6 +44,25 @@ program.action(async () => {
       },
     ]);
     const userPrompt = answers.prompt;
+    const options = program.opts();
+
+    let selectedModelName = DEFAULT_MODEL_NAME;
+    if (options.model) {
+      const modelAlias = options.model;
+      if (ALLOWED_MODELS[modelAlias]) {
+        selectedModelName = ALLOWED_MODELS[modelAlias];
+        console.log(`Using AI model: ${selectedModelName}`);
+      } else {
+        console.error(
+          `Error: Invalid model alias '${modelAlias}'. Allowed aliases are: ${Object.keys(ALLOWED_MODELS).join(", ")}`
+        );
+        return;
+      }
+    } else {
+      console.log(
+        `No model specified, using default AI model: ${selectedModelName}`
+      );
+    }
 
     console.log("Analyzing repository structure...");
     const tree = await getTreeStructure();
@@ -57,7 +80,7 @@ program.action(async () => {
       return; // Exit the action if token count is too high
     }
 
-    const aiResponse = await callAI(fullPrompt);
+    const aiResponse = await callAI(fullPrompt, selectedModelName as string);
 
     let relevantFiles: string[] = aiResponse.relevant_files;
     console.log("Relevant files:");
@@ -158,7 +181,10 @@ program.action(async () => {
             relevantFiles,
             userComments
           );
-          const refinedResponse = await callAI(refinementPrompt);
+          const refinedResponse = await callAI(
+            refinementPrompt,
+            selectedModelName as string
+          );
           relevantFiles = refinedResponse.relevant_files;
           console.log("Refined relevant files:");
           relevantFiles.forEach((file: string) => console.log(`- ${file}`));
