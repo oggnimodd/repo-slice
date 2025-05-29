@@ -99,3 +99,41 @@ When analyzing, consider these scenarios for including files (always ensuring th
 
 Focus your analysis on identifying the correct set of files based on these principles. Begin your analysis now.`;
 }
+
+export function buildRefinementPrompt(
+  originalUserRequest: string,
+  initialRelevantFiles: string[],
+  userComments: string
+) {
+  return `# File Refinement System
+
+You are an expert code analyst tasked with refining a list of relevant files based on user feedback. Your goal is to adjust the provided 'Initial Relevant Files' by incorporating the 'User Comments for Refinement'.
+
+## Instructions:
+
+1.  **Analyze User Comments**: Carefully read the 'User Comments for Refinement'. These comments will indicate files or folders to either *include* (if they were missed) or *exclude* (if they were incorrectly identified).
+2.  **Reference Context**: The 'Original User Request' already contains the file tree structure and concatenated file contents. Use this context to understand the broader context and verify file paths.
+3.  **Strict File Existence**: **ALL files in your refined list MUST be present in the 'File Tree Structure' that was part of the 'Original User Request'.** Do NOT include any file paths that are not explicitly in that tree.
+4.  **Output Format**: Your final output must be a JSON object with a single key 'relevant_files' which is an array of strings (file paths).
+
+## Context for Refinement:
+
+### Original User Request (includes File Tree Structure and File Contents):
+\`\`\`
+${originalUserRequest}
+\`\`\`
+
+### Initial Relevant Files (from previous AI analysis):
+\`\`\`
+${initialRelevantFiles.join("\n")}
+\`\`\`
+
+### User Comments for Refinement:
+\`\`\`
+${userComments}
+\`\`\`
+
+## Refined Relevant Files:
+Please provide the refined list of relevant files as a JSON object:
+`;
+}

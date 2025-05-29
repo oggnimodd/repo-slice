@@ -3,7 +3,7 @@ import { Command } from "commander";
 import inquirer from "inquirer";
 import { getTreeStructure } from "./tree";
 import { callAI } from "./ai";
-import { buildPrompt } from "./prompt";
+import { buildPrompt, buildRefinementPrompt } from "./prompt";
 import {
   copyFileContentsToClipboard,
   copyFilePathsAsJson,
@@ -59,72 +59,116 @@ program.action(async () => {
 
     const aiResponse = await callAI(fullPrompt);
 
-    const relevantFiles: string[] = aiResponse.relevant_files;
+    let relevantFiles: string[] = aiResponse.relevant_files;
     console.log("Relevant files:");
     relevantFiles.forEach((file: string) => console.log(`- ${file}`));
 
-    const copyAnswers = await inquirer.prompt([
-      {
-        type: "list",
-        name: "copyOption",
-        message: "How would you like to copy the relevant files?",
-        choices: [
-          {
-            name: "Copy all file content to clipboard",
-            value: "content",
-          },
-          {
-            name: "Copy relevant file paths as JSON array",
-            value: "json",
-          },
-          {
-            name: "Copy relevant file paths as @file format (@file1 @file2)",
-            value: "at_file",
-          },
-          {
-            name: "Copy relevant file paths as newline-separated list",
-            value: "newline",
-          },
-        ],
-      },
-    ]);
+    let continueLoop = true;
+    while (continueLoop) {
+      const copyAnswers = await inquirer.prompt([
+        {
+          type: "list",
+          name: "copyOption",
+          message: "How would you like to copy the relevant files?",
+          choices: [
+            {
+              name: "Copy all file content to clipboard",
+              value: "content",
+            },
+            {
+              name: "Copy relevant file paths as JSON array",
+              value: "json",
+            },
+            {
+              name: "Copy relevant file paths as @file format (@file1 @file2)",
+              value: "at_file",
+            },
+            {
+              name: "Copy relevant file paths as newline-separated list",
+              value: "newline",
+            },
+            {
+              name: "Refine relevant files (add/remove files based on comments)",
+              value: "refine",
+            },
+            {
+              name: "Exit",
+              value: "exit",
+            },
+          ],
+        },
+      ]);
 
-    switch (copyAnswers.copyOption) {
-      case "content":
-        const modeAnswers = await inquirer.prompt([
-          {
-            type: "list",
-            name: "aiResponseMode",
-            message: "Select AI response mode:",
-            choices: [
-              { name: "Diff Mode (AI responds with diffs)", value: "diff" },
-              { name: "Normal Mode (AI responds freely)", value: "normal" },
-            ],
-          },
-        ]);
-        const aiResponseMode = modeAnswers.aiResponseMode;
-        await copyFileContentsToClipboard(
-          relevantFiles,
-          userPrompt,
-          tree,
-          aiResponseMode
-        );
-        console.log("All relevant file contents copied to clipboard!");
-        break;
-      case "json":
-        await copyFilePathsAsJson(relevantFiles);
-        console.log("Relevant file paths (JSON) copied to clipboard!");
-        break;
-      case "at_file":
-        await copyFilePathsAsAtFileFormat(relevantFiles);
-        console.log("Relevant file paths (@file format) copied to clipboard!");
-        break;
-      case "newline":
-        await copyFilePathsAsNewlineSeparated(relevantFiles);
-        console.log(
-          "Relevant file paths (newline-separated) copied to clipboard!"
-        );
-        break;
+      switch (copyAnswers.copyOption) {
+        case "content":
+          const modeAnswers = await inquirer.prompt([
+            {
+              type: "list",
+              name: "aiResponseMode",
+              message: "Select AI response mode:",
+              choices: [
+                { name: "Diff Mode (AI responds with diffs)", value: "diff" },
+                { name: "Normal Mode (AI responds freely)", value: "normal" },
+              ],
+            },
+          ]);
+          const aiResponseMode = modeAnswers.aiResponseMode;
+          await copyFileContentsToClipboard(
+            relevantFiles,
+            userPrompt,
+            tree,
+            aiResponseMode
+          );
+          console.log("All relevant file contents copied to clipboard!");
+          continueLoop = false;
+          break;
+        case "json":
+          await copyFilePathsAsJson(relevantFiles);
+          console.log("Relevant file paths (JSON) copied to clipboard!");
+          continueLoop = false;
+          break;
+        case "at_file":
+          await copyFilePathsAsAtFileFormat(relevantFiles);
+          console.log(
+            "Relevant file paths (@file format) copied to clipboard!"
+          );
+          continueLoop = false;
+          break;
+        case "newline":
+          await copyFilePathsAsNewlineSeparated(relevantFiles);
+          console.log(
+            "Relevant file paths (newline-separated) copied to clipboard!"
+          );
+          continueLoop = false;
+          break;
+        case "refine":
+          const commentAnswer = await inquirer.prompt([
+            {
+              type: "input",
+              name: "comments",
+              message:
+                "Please enter your comments to refine the file list (e.g., 'exclude these folders', 'include these files'):",
+            },
+          ]);
+          const userComments = commentAnswer.comments;
+
+          console.log("Refining relevant files based on your comments...");
+          const refinementPrompt = buildRefinementPrompt(
+            fullPrompt, // Pass the full initial prompt for context
+            relevantFiles,
+            userComments
+          );
+          const refinedResponse = await callAI(refinementPrompt);
+          relevantFiles = refinedResponse.relevant_files;
+          console.log("Refined relevant files:");
+          relevantFiles.forEach((file: string) => console.log(`- ${file}`));
+          // Loop continues to allow further refinement or copy action
+          break;
+        case "exit":
+          console.log("Exiting without copying files.");
+          continueLoop = false;
+          break;
+      }
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
