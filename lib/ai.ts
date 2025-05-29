@@ -1,7 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import ora from "ora";
-import { GEMINI_API_KEY } from "./constants";
+import { GEMINI_API_KEY } from "@/constants";
 import { z } from "zod";
 
 const relevantFilesSchema = z.object({

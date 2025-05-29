@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
 import { Command } from "commander";
 import inquirer from "inquirer";
-import { getTreeStructure } from "./tree";
-import { callAI } from "./ai";
-import { buildPrompt, buildRefinementPrompt } from "./prompt";
+import { getTreeStructure } from "@/tree";
+import { callAI } from "@/ai";
+import { buildPrompt, buildRefinementPrompt } from "@/prompt";
 import {
   copyFileContentsToClipboard,
   copyFilePathsAsJson,
   copyFilePathsAsAtFileFormat,
   copyFilePathsAsNewlineSeparated,
-} from "./copy";
+} from "@/copy";
 import {
   ALLOWED_TEXT_FILE_EXTENSIONS,
   MAX_FILE_LINES,
@@ -18,8 +18,8 @@ import {
   MAX_AI_TOKENS,
   ALLOWED_MODELS,
   DEFAULT_MODEL_NAME,
-} from "./constants";
-import { estimateTokenCount } from "./utils";
+} from "@/constants";
+import { estimateTokenCount } from "@/utils";
 import path, { join } from "path";
 import { readdir, stat } from "fs/promises";
 
